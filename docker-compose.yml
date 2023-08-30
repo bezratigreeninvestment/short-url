@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  short-url:
+    image: ibezrati/short-url:0.0.1-SNAPSHOT
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
+      DB_URL: jdbc:mysql://mysql:3306/short-url
+      DB_USERNAME: short-url-user
+      DB_PASSWORD: changeme
+      DB_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+    networks:
+      - short-url-network
+
+  mysql:
+    image: mysql:8.0
+    hostname: mysql
+    ports:
+      - "4306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dummypassword
+      MYSQL_USER: short-url-user
+      MYSQL_PASSWORD: changeme
+      MYSQL_DATABASE: short-url
+    volumes:
+      - mysql-database-data-volume:/var/lib/mysql
+    networks:
+      - short-url-network
+
+volumes:
+  mysql-database-data-volume:
+
+networks:
+  short-url-network:
